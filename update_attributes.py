@@ -4,13 +4,19 @@ import csv
 import re
 import json
 
+csv_components = {}
 with open('test.csv', 'rb') as csv_file:
 
-    component_reader = csv.reader(csv_file, delimiter=',', quotechar='"')
+    component_reader = csv.DictReader(csv_file, delimiter=',', quotechar='"')
 
     for component in component_reader:
-        print component
-        #print ', '.join(row)
+        for refdes in component['refdes'].split(","):
+            component.pop("refdes", None)
+            component.pop("qty", None)
+            csv_components[refdes] = component
+
+print json.dumps(csv_components, sort_keys=True, indent=4)
+
 
 components = {}
 with open("filter.sch", "r") as sch_file:
@@ -45,4 +51,4 @@ with open("filter.sch", "r") as sch_file:
         if refdes != "":
             components[refdes] = component
 
-print json.dumps(components, sort_keys=True, indent=4)
+#print json.dumps(components, sort_keys=True, indent=4)
