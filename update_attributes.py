@@ -12,8 +12,6 @@ with open('test.csv', 'rb') as csv_file:
         print component
         #print ', '.join(row)
 
-lines = (line.rstrip('\n') for line in open("filter.sch"))
-
 components = {}
 with open("filter.sch", "r") as sch_file:
 
