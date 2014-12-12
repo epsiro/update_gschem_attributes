@@ -18,37 +18,54 @@ with open('test.csv', 'rb') as csv_file:
 print json.dumps(csv_components, sort_keys=True, indent=4)
 
 
-components = {}
-with open("filter.sch", "r") as sch_file:
+def get_component_from_sch(schematic_file, subcircuit=""):
+    components = {}
+    with open(schematic_file, "r") as sch_file:
 
-    schem = sch_file.read()
+        schem = sch_file.read()
 
-    # Collect the number of characters we have read so far in the file
-    # for a given line (list index). This gives the relationship between
-    # number of chars read and which line we are on.
-    char_on_line = []
-    for m in re.finditer('.*\n', schem):
-        char_on_line.append(m.end())
+        # Collect the number of characters we have read so far in the file
+        # for a given line (list index). This gives the relationship between
+        # number of chars read and which line we are on.
+        char_on_line = []
+        for m in re.finditer('.*\n', schem):
+            char_on_line.append(m.end())
 
-    prog = re.compile('\{([^}]+)\}')
-    for match in prog.finditer(schem):
+        prog = re.compile('\{([^}]+)\}')
+        for match in prog.finditer(schem):
 
-        refdes = ""
-        component = {}
+            refdes = ""
+            component = {}
 
-        # Get the line number for the start of the match
-        match_start_line_nr = next(i for i in range(len(char_on_line)) if char_on_line[i] > match.start())
+            # Get the line number for the start of the match
+            match_start_line_nr = next(i for i in range(len(char_on_line)) if char_on_line[i] > match.start())
 
-        attributes = match.group().split("\n")
-        for i, attribute in enumerate(attributes):
-            if attribute.startswith("refdes"):
-                refdes = attribute
-            if not attribute.startswith("T"):
-                # Get the line number of the attribute
-                component[attribute] = match_start_line_nr + i
+            attributes = match.group().split("\n")
+            for i, attribute in enumerate(attributes):
+                if attribute.startswith("refdes"):
+                    refdes = attribute
+                if not attribute.startswith(("T", "{", "}")):
+                    # Get the line number of the attribute
+                    component[attribute.split("=")[0]] = match_start_line_nr + i
 
-        # If we found a component, add it to the list (dictionary)
-        if refdes != "":
-            components[refdes] = component
+            # If we found a component, add it to the list (dictionary)
+            if refdes != "":
+                if subcircuit != "":
+                    subcircuit_refdes = subcircuit + "/" + refdes.split("=")[1]
+                else:
+                    subcircuit_refdes = refdes.split("=")[1]
 
-#print json.dumps(components, sort_keys=True, indent=4)
+                components[subcircuit_refdes] = component
+
+    return components
+
+with open("schematics", "r") as schs_file:
+    for schematic in schs_file.readlines():
+        schematic = schematic.split(",")
+        subcircuit = schematic[0]
+        schematic_file = schematic[1].strip()
+
+        if subcircuit != "":
+
+            components = get_component_from_sch(schematic_file, subcircuit)
+            print json.dumps(components, sort_keys=True, indent=4)
