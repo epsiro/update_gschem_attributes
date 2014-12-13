@@ -57,6 +57,7 @@ def get_component_from_sch(schematic_file, subcircuit=""):
 
                 components[subcircuit_refdes] = component
 
+    #print json.dumps(components, sort_keys=True, indent=4)
     return components
 
 with open("schematics", "r") as schs_file:
@@ -67,5 +68,22 @@ with open("schematics", "r") as schs_file:
 
         if subcircuit != "":
 
-            components = get_component_from_sch(schematic_file, subcircuit)
-            print json.dumps(components, sort_keys=True, indent=4)
+            sch_components = get_component_from_sch(schematic_file, subcircuit)
+
+            with open(schematic_file, "r") as sch_file:
+                data = sch_file.readlines()
+
+                for refdes, attributes in sch_components.iteritems():
+                    if refdes in csv_components:
+                        for attribute in attributes:
+                            #print csv_components[refdes]
+                            if attribute in csv_components[refdes]:
+                                attribute_line_number = sch_components[refdes][attribute]
+                                new_attribute = csv_components[refdes].pop(attribute, None)
+                                data[attribute_line_number] = attribute + "=" + new_attribute + "\n"
+                        print refdes, "attributes not updated", csv_components[refdes]
+                    else:
+                        print "refdes " + refdes + " not found in csv"
+
+            with open(schematic_file, 'w') as file:
+                    file.writelines( data )
