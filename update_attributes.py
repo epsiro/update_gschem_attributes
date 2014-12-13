@@ -13,7 +13,7 @@ with open('test.csv', 'rb') as csv_file:
         for refdes in component['refdes'].split(","):
             component.pop("refdes", None)
             component.pop("qty", None)
-            csv_components[refdes] = component
+            csv_components[refdes] = component.copy()
 
 print json.dumps(csv_components, sort_keys=True, indent=4)
 
