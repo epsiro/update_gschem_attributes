@@ -81,7 +81,14 @@ with open("schematics", "r") as schs_file:
                                 attribute_line_number = sch_components[refdes][attribute]
                                 new_attribute = csv_components[refdes].pop(attribute, None)
                                 data[attribute_line_number] = attribute + "=" + new_attribute + "\n"
-                        print refdes, "attributes not updated", csv_components[refdes]
+
+                        # Add the new attributes
+                        new_attributes = ""
+                        for attribute in csv_components[refdes]:
+                            new_attribute = csv_components[refdes][attribute]
+                            new_attributes = new_attributes + "T ...\n" + attribute + "=" + new_attribute + "\n"
+
+                        data[attribute_line_number] = data[attribute_line_number] + new_attributes
                     else:
                         print "refdes " + refdes + " not found in csv"
 
