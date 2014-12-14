@@ -86,7 +86,19 @@ with open("schematics", "r") as schs_file:
                         new_attributes = ""
                         for attribute in csv_components[refdes]:
                             new_attribute = csv_components[refdes][attribute]
-                            new_attributes = new_attributes + "T ...\n" + attribute + "=" + new_attribute + "\n"
+                            position = data[attribute_line_number-1].split(" ")
+                            x = position[1]
+                            y = position[2]
+                            color = 5
+                            size = 10
+                            visibility = 0
+                            show_name_value = 0
+                            angle = 0
+                            alignment = 0
+                            num_lines = 1
+                            text_style = "T " + str(x) + " " + str(y) + " " + str(color) + " " + str(size) + " " + str(visibility) + \
+                                " " + str(show_name_value) + " " + str(angle) + " " + str(alignment) + " " + str(num_lines) + "\n"
+                            new_attributes = new_attributes + text_style + attribute + "=" + new_attribute + "\n"
 
                         data[attribute_line_number] = data[attribute_line_number] + new_attributes
                     else:
