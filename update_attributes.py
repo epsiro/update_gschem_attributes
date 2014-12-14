@@ -80,12 +80,16 @@ with open("schematics", "r") as schs_file:
                             if attribute in csv_components[refdes]:
                                 attribute_line_number = sch_components[refdes][attribute]
                                 new_attribute = csv_components[refdes].pop(attribute, None)
+                                if new_attribute == "":
+                                    new_attribute = "unknown"
                                 data[attribute_line_number] = attribute + "=" + new_attribute + "\n"
 
                         # Add the new attributes
                         new_attributes = ""
                         for attribute in csv_components[refdes]:
                             new_attribute = csv_components[refdes][attribute]
+                            if new_attribute == "":
+                                new_attribute = "unknown"
                             position = data[attribute_line_number-1].split(" ")
                             x = position[1]
                             y = position[2]
